@@ -1,6 +1,6 @@
 # iPhone BLE connection test
 
-This repository contains a simple BLEUart connection range test to duplicate iPhone 17e reconnection issue.
+This repository contains a simple BLEUart connection range test to duplicate iPhone 17e reconnection issue. The relavent test proceedure and be found in the file: [Test_Proceedure.md](Test_Proceedure.md).
 
 ### Mac Setup Prerequisites
 
