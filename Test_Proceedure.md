@@ -9,7 +9,7 @@ Mac setup is only necessary to rebuild the source code. Setup instructions can b
 
 
 ### iPhone Setup
-1.  Install the latest IOS version (27.0.1 as of this publication)
+1.  Install the latest IOS version (27.0.1 or 27.2 as of this publication)
 2.  Install the [BluefruitConnect](https://apps.apple.com/us/app/bluefruit-connect/id830125974) app from the Apple App Store
 3.  Open the App and give it permission to use BLE
 
