@@ -1,0 +1,58 @@
+# This is the name of the workflow, visible on GitHub UI.
+name: build
+
+# Here we tell GitHub to run the workflow when a commit
+# is pushed or a Pull Request is opened.
+on: [push, pull_request]
+
+# This is the list of jobs that will be run concurrently.
+# Since we use a build matrix, the actual number of jobs
+# started depends on how many configurations the matrix
+# will produce.
+jobs:
+  # This is the name of the job - can be whatever.
+  build:
+
+    # Here we tell GitHub that the jobs must be determined
+    # dynamically depending on a matrix configuration.
+    strategy:
+      matrix:
+        fqbn:
+          - "shorepine:nrf52:xiaonRF52840Plus"
+
+    # This is the platform GitHub will use to run our workflow
+    runs-on: ubuntu-latest
+
+    # This is the list of steps this job will run.
+    steps:
+      # First of all, we clone the repo using the `checkout` action.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: |
+          pip3 install --break-system-packages adafruit-nrfutil uritemplate requests intelhex setuptools
+
+      # We use the `arduino/setup-arduino-cli` action to install and
+      # configure the Arduino CLI on the system.
+      #- name: Setup Arduino CLI
+      #  uses: arduino/setup-arduino-cli@v2
+
+      - name: Install config, cores and libraries
+        run: make arduino-cli config-file cores libs
+
+      - name: Complie sketch
+        run: BOARD=${{ matrix.fqbn }} make all
+
+      - name: Prepare helper environment variables
+        run: |
+          BOARD_DIR="${{ matrix.fqbn }}"
+          echo "BOARD_DIR=${BOARD_DIR//:/.}" >> $GITHUB_ENV
+          echo "BUILD_VARIANT=${BOARD_DIR##*:}" >> $GITHUB_ENV
+          echo "BUILD_TAG=${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+          echo "PROJECT_NAME=$(basename -- ${GITHUB_REPOSITORY})" >> $GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.PROJECT_NAME }}_${{ env.BUILD_VARIANT }}_${{ env.BUILD_TAG }}
+          path: build/${{ env.BOARD_DIR }}
